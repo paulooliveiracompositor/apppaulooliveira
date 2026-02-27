@@ -1,5 +1,7 @@
 # Vibe Music Player PWA
 
+> **Atenção Administrador Principal:** Veja o passo-a-passo ilustrado com senhas do painel em **[MANUAL DO PAULO](./MANUAL_DO_PAULO.md)**.
+
 ## Project Goal
 Um aplicativo mobile-first PWA criado para Paulo Oliveira divulgar, apresentar e arquivar virtualmente suas obras musicais autorais de forma bonita e imersiva. O app possibilita audição via player global integrado, acompanhamento da letra com interface glassmorphism premium (estilo Vibe/Spotify/Apple Music), geração de QR Code de canções ou do app inteiro para difusão social e downloads focados. Há também formulário de Contato Direto via WhatsApp. 
 
