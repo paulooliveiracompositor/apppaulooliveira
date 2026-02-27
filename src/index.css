@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-50: #eef2ff;
+  --color-primary-100: #e0e7ff;
+  --color-primary-500: #6366f1;
+  --color-primary-600: #4f46e5;
+  --color-primary-900: #312e81;
+  --color-primary-950: #1e1b4b;
+  
+  --color-surface: rgba(30, 41, 59, 0.4);
+  --color-surface-dim: rgba(15, 23, 42, 0.6);
+  --color-border: rgba(255, 255, 255, 0.1);
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-slate-950 text-slate-100 font-sans antialiased min-h-screen relative overflow-x-hidden;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-surface backdrop-blur-xl border border-white/10 shadow-xl;
+  }
+  .glass-card {
+    @apply bg-surface rounded-2xl backdrop-blur-lg border border-white/5 shadow-2xl transition-all duration-300;
+  }
+  .glass-panel {
+    @apply bg-surface-dim backdrop-blur-3xl border-t border-white/10;
+  }
+  .text-glow {
+    text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+  }
+  .bg-glow {
+    @apply absolute blur-[100px] opacity-30 pointer-events-none rounded-full;
+  }
+}
+
+/* Scrollbar Bonitinha */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
