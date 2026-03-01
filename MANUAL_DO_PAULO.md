@@ -56,8 +56,8 @@ Sempre que for lançar uma música nova, você salva o MP3 lá dentro e pega a "
 2. Faça Login com a sua conta do NekoWeb:
    * **Username:** `paulooliveira`
    * **Password (Senha):** `Paulo1979`
-3. Ao entrar, você verá as suas pastas. Nós criamos lá dentro a possibilidade para você hospedar coisas.
-4. Clique no botãozinho de Nuvem ou **Upload** (Subir) e envie o Arquivo MP3 da sua música e a Imagem da Capa para lá.
+3. Ao entrar, você verá as suas pastas *musicas, letras, capas). Nós criamos lá dentro a possibilidade para você hospedar coisas.
+4. Entre na pasta (clicando em cima do nome dela) que corresponde ao arquivo que quer enviar. Clique no botãozinho de Nuvem ou **Upload** (Subir) e envie o Arquivo MP3 da sua música e a Imagem da Capa para lá.
 5. Quando o arquivo aparecer na lista, clique com o botão direito nele (ou segure pelo celular) e escolha **"Copiar Endereço do Link"** (Copy Link Address). O link copiado deve ficar parecido com `https://paulooliveira.nekoweb.org/minha-musica-nova.mp3`.
 6. Agora, basta voltar no seu App da Vibe Music Player lá no Painel Admin (Passo 2), pular o botão de Enviar arquivo, e **colar esse Link dentro da caixinha da "Opção 2"**!
 

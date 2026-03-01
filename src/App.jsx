@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams, useLocation } from 'react-router-dom';
-import { Play, Pause, SkipBack, SkipForward, Volume2, Search, Settings, Home as HomeIcon, User, Share2, Download, LogOut, Check, ChevronLeft, Plus, Edit2, Trash2, Heart, Shuffle, ListMusic, LayoutGrid, RotateCw, MoreHorizontal, Loader2 } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2, Search, Settings, Home as HomeIcon, User, Share2, Download, LogOut, Check, ChevronLeft, Plus, Edit2, Trash2, Heart, Shuffle, ListMusic, LayoutGrid, RotateCw, MoreHorizontal, Loader2, Repeat, Repeat1 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import QRCode from 'react-qr-code';
 import { supabase } from './lib/supabase';
@@ -16,6 +16,8 @@ export const PlayerProvider = ({ children }) => {
     const audioRef = useRef(null);
 
     const [mockSongs, setMockSongs] = useState([]);
+    const [isRepeat, setIsRepeat] = useState(false);
+    const [isShuffle, setIsShuffle] = useState(false);
 
     useEffect(() => {
         const fetchRemoteSongs = async () => {
@@ -65,6 +67,25 @@ export const PlayerProvider = ({ children }) => {
         }
     };
 
+    const playNext = () => {
+        if (!currentSong || mockSongs.length === 0) return;
+        if (isShuffle) {
+            const randomIndex = Math.floor(Math.random() * mockSongs.length);
+            playSong(mockSongs[randomIndex]);
+            return;
+        }
+        const currentIndex = mockSongs.findIndex(s => s.id === currentSong.id);
+        const nextIndex = (currentIndex + 1) % mockSongs.length;
+        playSong(mockSongs[nextIndex]);
+    };
+
+    const playPrev = () => {
+        if (!currentSong || mockSongs.length === 0) return;
+        const currentIndex = mockSongs.findIndex(s => s.id === currentSong.id);
+        const prevIndex = (currentIndex - 1 + mockSongs.length) % mockSongs.length;
+        playSong(mockSongs[prevIndex]);
+    };
+
     const [likedSongs, setLikedSongs] = useState([]);
     const toggleLike = (song) => {
         if (likedSongs.some(s => s.id === song.id)) {
@@ -77,14 +98,23 @@ export const PlayerProvider = ({ children }) => {
     return (
         <PlayerContext.Provider value={{
             currentSong, isPlaying, progress, duration, togglePlay, playSong, seek, audioRef,
-            mockSongs, setMockSongs, likedSongs, toggleLike
+            mockSongs, setMockSongs, likedSongs, toggleLike, playNext, playPrev, isRepeat, setIsRepeat, isShuffle, setIsShuffle
         }}>
             {children}
             <audio
                 ref={audioRef}
                 src={currentSong?.audio_url}
                 onTimeUpdate={handleTimeUpdate}
-                onEnded={() => setIsPlaying(false)}
+                onEnded={() => {
+                    if (isRepeat) {
+                        if (audioRef.current) {
+                            audioRef.current.currentTime = 0;
+                            audioRef.current.play().catch(e => console.log('Audio replay blocked', e));
+                        }
+                    } else {
+                        playNext();
+                    }
+                }}
             />
         </PlayerContext.Provider>
     );
@@ -102,7 +132,7 @@ const GlowingBackground = () => (
 );
 
 const FloatingPlayer = () => {
-    const { currentSong, isPlaying, togglePlay } = React.useContext(PlayerContext);
+    const { currentSong, isPlaying, togglePlay, playNext, playPrev } = React.useContext(PlayerContext);
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -133,7 +163,7 @@ const FloatingPlayer = () => {
             </div>
 
             <div className="flex items-center gap-3">
-                <button onClick={(e) => { e.stopPropagation(); /* Prev logic */ }} className="text-white hover:text-[#d4f85e] transition">
+                <button onClick={(e) => { e.stopPropagation(); playPrev(); }} className="text-white hover:text-[#d4f85e] transition">
                     <SkipBack size={18} fill="currentColor" />
                 </button>
                 <button
@@ -142,7 +172,7 @@ const FloatingPlayer = () => {
                 >
                     {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" />}
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); /* Next logic */ }} className="text-white hover:text-[#d4f85e] transition">
+                <button onClick={(e) => { e.stopPropagation(); playNext(); }} className="text-white hover:text-[#d4f85e] transition">
                     <SkipForward size={18} fill="currentColor" />
                 </button>
             </div>
@@ -405,7 +435,7 @@ function MusicListView() {
 function SongDetailView() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { mockSongs, playSong, currentSong, isPlaying, seek, progress, duration, togglePlay } = React.useContext(PlayerContext);
+    const { mockSongs, playSong, currentSong, isPlaying, seek, progress, duration, togglePlay, playNext, playPrev, isRepeat, setIsRepeat, isShuffle, setIsShuffle } = React.useContext(PlayerContext);
 
     const [showQR, setShowQR] = useState(false);
     const song = mockSongs.find(s => s.id === id) || currentSong;
@@ -482,8 +512,10 @@ function SongDetailView() {
 
                         {/* Controls */}
                         <div className="flex items-center justify-between px-2">
-                            <button className="text-slate-400 hover:text-white transition"><Shuffle size={24} /></button>
-                            <button className="text-white hover:text-[#d4f85e] transition" onClick={() => {/* prev */ }}><SkipBack size={32} fill="currentColor" /></button>
+                            <button onClick={() => setIsShuffle(!isShuffle)} className={`transition ${isShuffle ? 'text-[#d4f85e]' : 'text-slate-400 hover:text-white'}`}>
+                                <Shuffle size={24} />
+                            </button>
+                            <button className="text-white hover:text-[#d4f85e] transition" onClick={() => playPrev()}><SkipBack size={32} fill="currentColor" /></button>
 
                             <button
                                 onClick={() => playSong(song)}
@@ -492,8 +524,11 @@ function SongDetailView() {
                                 {isThisPlaying ? <Pause size={32} fill="currentColor" /> : <Play size={32} fill="currentColor" className="ml-1" />}
                             </button>
 
-                            <button className="text-white hover:text-[#d4f85e] transition" onClick={() => {/* next */ }}><SkipForward size={32} fill="currentColor" /></button>
-                            <button className="text-slate-400 hover:text-white transition"><ListMusic size={24} /></button>
+                            <button className="text-white hover:text-[#d4f85e] transition" onClick={() => playNext()}><SkipForward size={32} fill="currentColor" /></button>
+                            
+                            <button onClick={() => setIsRepeat(!isRepeat)} className={`transition ${isRepeat ? 'text-[#d4f85e]' : 'text-slate-400 hover:text-white'}`}>
+                                {isRepeat ? <Repeat1 size={24} /> : <Repeat size={24} />}
+                            </button>
                         </div>
                     </div>
                 )}
